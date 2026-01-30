@@ -1,0 +1,99 @@
+services:
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile.prod
+    container_name: frontend
+    env_file:
+      - ./apps/frontend/.env.production
+    environment:
+      VIRTUAL_HOST: cpa-chatwork-senderkun.knowstack.net
+      LETSENCRYPT_HOST: cpa-chatwork-senderkun.knowstack.net
+      LETSENCRYPT_EMAIL: kobayashi.soyu@gmail.com
+      VIRTUAL_PORT: 3000
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    networks:
+      - app-net-prod
+
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile.prod
+    container_name: backend
+    env_file:
+      - ./apps/backend/.env.production
+    environment:
+      VIRTUAL_HOST: cpa-chatwork-senderkun.knowstack.net
+      LETSENCRYPT_HOST: cpa-chatwork-senderkun.knowstack.net
+      LETSENCRYPT_EMAIL: kobayashi.soyu@gmail.com
+      VIRTUAL_PORT: 8000
+      VIRTUAL_PATH: /api
+    ports:
+      - "8000:8000" # FastAPI のみ公開
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - app-net-prod
+
+  db:
+    image: postgres:16
+    restart: always
+    env_file:
+      - ./apps/backend/.env.production
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      - app-net-prod
+
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # nginx設定用
+      - ./nginx-data/conf:/etc/nginx/conf.d
+      - ./nginx-data/vhost:/etc/nginx/vhost.d
+      - ./nginx-data/html:/usr/share/nginx/html
+      - ./nginx-data/certs:/etc/nginx/certs:ro
+      # Docker socket（読み取り専用）
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./conf/uploadsize.conf:/etc/nginx/conf.d/uploadsize.conf
+    restart: always
+    networks:
+      - app-net-prod
+
+  acme-companion:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    environment:
+      - DEFAULT_EMAIL=kobayashi.soyu@gmail.com
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+    volumes:
+      # nginx-proxyと共有するボリューム
+      - ./nginx-data/conf:/etc/nginx/conf.d
+      - ./nginx-data/vhost:/etc/nginx/vhost.d
+      - ./nginx-data/html:/usr/share/nginx/html
+      - ./nginx-data/certs:/etc/nginx/certs:rw
+      # acme.sh設定用
+      - ./nginx-data/acme:/etc/acme.sh
+      # Docker socket（読み書き可能）
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - app-net-prod
+    depends_on:
+      - nginx-proxy
+    restart: always
+
+volumes:
+  dbdata:
+
+networks:
+  app-net-prod:
+    driver: bridge

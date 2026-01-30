@@ -1,0 +1,124 @@
+# ======================================================
+# AI 人狼（Next.js + FastAPI + Docker + Docusaurus）
+# 専用 .gitattributes — Windows/WSL/Docker 安定化仕様
+# ======================================================
+
+# ----------------------------------------
+# 1. 基本方針：すべてのテキストを LF に統一
+# ----------------------------------------
+* text=auto eol=lf
+
+
+# ----------------------------------------
+# 2. Web（Next.js / API / 設定ファイル）
+# ----------------------------------------
+*.js      text eol=lf
+*.mjs     text eol=lf
+*.cjs     text eol=lf
+*.jsx     text eol=lf
+*.ts      text eol=lf
+*.tsx     text eol=lf
+*.json    text eol=lf
+*.jsonc   text eol=lf
+*.yaml    text eol=lf
+*.yml     text eol=lf
+*.html    text eol=lf
+*.css     text eol=lf
+*.scss    text eol=lf
+*.svg     text eol=lf
+*.md      text eol=lf
+
+
+# ----------------------------------------
+# 3. FastAPI（Python）
+# ----------------------------------------
+*.py      text eol=lf
+pyproject.toml text eol=lf
+requirements*.txt text eol=lf
+*.jinja2  text eol=lf
+
+
+# ----------------------------------------
+# 4. Docker / DevOps / CI
+# ----------------------------------------
+*.sh                 text eol=lf
+Dockerfile           text eol=lf
+*.Dockerfile         text eol=lf
+docker-compose*.yml  text eol=lf
+*.conf               text eol=lf
+*.service            text eol=lf
+*.unit               text eol=lf
+*.toml               text eol=lf
+
+
+# ----------------------------------------
+# 5. Next.js ビルド成果物（誤差分防止）
+# ----------------------------------------
+.next/** binary
+out/** binary
+
+
+# ----------------------------------------
+# 6. FastAPI のキャッシュ関連
+# ----------------------------------------
+__pycache__/** binary
+*.pyc binary
+
+
+# ----------------------------------------
+# 7. 環境変数（LF 固定）
+# ----------------------------------------
+*.env     text eol=lf
+*.env.*   text eol=lf
+
+
+# ----------------------------------------
+# 8. Windows 専用（例外：CRLF）
+# ----------------------------------------
+*.bat     text eol=crlf
+*.cmd     text eol=crlf
+
+
+# ----------------------------------------
+# 9. Lock ファイル（再現性と衝突防止）
+# ----------------------------------------
+package-lock.json text eol=lf
+yarn.lock         text eol=lf
+pnpm-lock.yaml    text eol=lf
+uv.lock           text eol=lf
+
+
+# ----------------------------------------
+# 10. バイナリ（差分禁止）
+# ----------------------------------------
+# 画像（AI 推論ログ、キャラ画像、アセット）
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+
+# 動画（プロモ映像・デモ動画）
+*.mp4   binary
+*.mov   binary
+
+# フォント（Docusaurus / UI）
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+
+# 圧縮ファイル
+*.zip   binary
+*.gz    binary
+*.tar   binary
+*.7z    binary
+*.rar   binary
+
+# その他バイナリ
+*.pdf   binary
+*.exe   binary
+*.dll   binary
+*.so    binary
+*.dylib binary

@@ -1,0 +1,38 @@
+# ============================
+# Node.js (Next.js / Docusaurus)
+# ============================
+
+node_modules/
+out/
+docs/docusaurus/build/
+docs/docusaurus/.docusaurus
+docs/docusaurus/.cache
+
+# ============================
+# Python (FastAPI)
+# ============================
+
+__pycache__/
+venv/
+dist/
+build/
+
+# ============================
+# envファイル
+# ============================
+
+.env
+.env.dev
+.env.development
+.env.prod
+.env.production
+
+# ============================
+# VSCode / JetBrains IDE
+# ============================
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+.idea/
+*.iml

@@ -1,0 +1,69 @@
+services:
+  # frontend:
+  #   build:
+  #     context: ./apps/frontend
+  #     dockerfile: Dockerfile.dev
+  #   container_name: frontend-dev
+  #   env_file:
+  #     - ./apps/frontend/.env.dev
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./apps/frontend:/app
+  #     - /app/node_modules
+  #   networks:
+  #     - app-net-dev
+
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile.dev
+    container_name: chatwork-senkun-api
+    env_file:
+      - ./apps/backend/.env.dev
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+      - "5678:5678"
+    volumes:
+      - ./apps/backend/app:/app/app # 🔥 ホットリロード用
+      - ./apps/backend/pyproject.toml:/app/pyproject.toml
+      - ./apps/backend/uv.lock:/app/uv.lock
+    networks:
+      - app-net-dev
+
+  redis-stack:
+    image: redis/redis-stack:7.4.0-v8
+    container_name: ai-werewolf-redis
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    networks:
+      - app-net-dev
+
+  docusaurus:
+    build:
+      context: ./docs/docusaurus
+      dockerfile: Dockerfile.dev
+    container_name: docusaurus-dev
+    ports:
+      - "4444:3000"
+    volumes:
+      - ./docs/docusaurus:/app # ← ホットリロード（ファイル編集が即反映）
+      - /app/node_modules
+    networks:
+      - app-net-dev
+
+volumes:
+  dbdata:
+
+
+networks:
+  app-net-dev:
+    driver: bridge

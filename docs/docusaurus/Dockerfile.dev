@@ -1,0 +1,15 @@
+FROM node:24-alpine
+
+WORKDIR /app
+
+# パッケージ情報をコピー
+COPY package.json package-lock.json ./
+
+# 開発依存も含めてインストール
+RUN npm install
+
+# ソースコードをすべてコピー
+COPY . .
+
+# ホットリロードで起動
+CMD ["npm", "run", "start", "--", "--host", "0.0.0.0"]
